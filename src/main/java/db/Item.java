@@ -4,14 +4,17 @@ import org.bson.Document;
 
 import java.util.Map;
 
-public class UserEntity implements CommonEntity {
-    public int id;
+public class Item implements CommonEntity {
+
+    public Integer id;
     public String name;
+    public Double price;
     public String currency;
 
-    public UserEntity(Integer id, String name, String currency) {
+    public Item(Integer id, String name, Double price, String currency) {
         this.id = id;
         this.name = name;
+        this.price = price;
         this.currency = currency;
     }
 
@@ -25,7 +28,7 @@ public class UserEntity implements CommonEntity {
         return new Document(Map.of(
                 "id", id,
                 "name", name,
-                "currency", currency)
-        );
+                "price", price,
+                "currency", currency));
     }
 }

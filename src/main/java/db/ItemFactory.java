@@ -2,11 +2,11 @@ package db;
 
 import org.bson.Document;
 
-public class ItemFactory implements Factory<ItemEntity> {
+public class ItemFactory implements Factory<Item> {
 
     @Override
-    public ItemEntity fromDocument(Document document) {
-        return new ItemEntity(
+    public Item fromDocument(Document document) {
+        return new Item(
                 document.getInteger("id"),
                 document.getString("name"),
                 document.getDouble("price"),

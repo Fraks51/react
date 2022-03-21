@@ -2,10 +2,10 @@ package db;
 
 import org.bson.Document;
 
-public class UserFactory implements Factory<UserEntity> {
+public class UserFactory implements Factory<User> {
     @Override
-    public UserEntity fromDocument(Document document) {
-        return new UserEntity(
+    public User fromDocument(Document document) {
+        return new User(
                 document.getInteger("id"),
                 document.getString("name"),
                 document.getString("currency")

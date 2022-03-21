@@ -3,7 +3,6 @@ package db;
 import com.mongodb.rx.client.MongoClients;
 import com.mongodb.client.model.Filters;
 import com.mongodb.rx.client.MongoDatabase;
-import com.mongodb.rx.client.Success;
 import rx.Observable;
 import currency.Currency;
 
@@ -29,15 +28,16 @@ public class ReactiveDAO {
         }
 
         public Observable<E> getById(int id) {
-            return db
+            Observable<E> id1 = db
                     .getCollection(collection)
                     .find(Filters.eq("id", id))
                     .toObservable()
                     .first()
                     .map(factory::fromDocument);
+            return id1;
         }
 
-        public Observable<Boolean> add(E entity) {
+        public Observable<String> add(E entity) {
             return getById(entity.getId())
                     .singleOrDefault(null)
                     .flatMap(found -> {
@@ -47,32 +47,34 @@ public class ReactiveDAO {
                                     .insertOne(entity.toDocument())
                                     .asObservable()
                                     .isEmpty()
-                                    .map(it -> !it);
+                                    .flatMap(it -> {
+                                        if (it) {
+                                            return Observable.just("Failed");
+                                        } else {
+                                            return Observable.just("Completed");
+                                        }
+                                    });
                         } else {
-                            return Observable.just(false);
+                            return Observable.just("Failed");
                         }
                     });
         }
 
-        public Observable<Success> deleteAll() {
-            return db.getCollection(collection)
-                     .drop();
-        }
     }
 
     static public final MongoDatabase db = MongoClients
             .create("mongodb://localhost:27017")
             .getDatabase("reactive");
 
-    static public final CommonDAO<UserEntity> userDao = new CommonDAO<>(db, "user", new UserFactory());
-    static public final CommonDAO<ItemEntity> itemDao = new CommonDAO<>(db, "item", new ItemFactory());
+    static public final CommonDAO<User> userDao = new CommonDAO<>(db, "user", new UserFactory());
+    static public final CommonDAO<Item> itemDao = new CommonDAO<>(db, "item", new ItemFactory());
 
-    static public Observable<ItemEntity> getItemsForUser(int userId) {
+    static public Observable<Item> getItemsForUser(int userId) {
         return userDao.getById(userId).flatMap(user ->
             itemDao.getAll().map(
                     item -> {
                         var newPrice = Currency.toNewPrice(item.price, item.currency, user.currency);
-                        return new ItemEntity(item.id, item.name, newPrice, user.currency);
+                        return new Item(item.id, item.name, newPrice, user.currency);
                     }
             )
         );

@@ -1,14 +1,11 @@
 package server;
 
-import db.ItemEntity;
+import db.Item;
 import db.ReactiveDAO;
-import db.UserEntity;
+import db.User;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import rx.Observable;
 
-import java.awt.event.ItemEvent;
-import java.net.http.HttpResponse;
-import java.security.KeyStore;
 import java.util.Currency;
 import java.util.List;
 import java.util.Map;
@@ -63,16 +60,13 @@ public class Controller {
                         "name", String.class,
                         "currency", Currency.class
                 ),
-                mapQ -> {
-                    var tmp = ReactiveDAO.userDao.add(
-                            new UserEntity(
+                mapQ -> ReactiveDAO.userDao.add(
+                            new User(
                                     Integer.parseInt(mapQ.get("id").get(0)),
                                     mapQ.get("name").get(0),
                                     mapQ.get("currency").get(0)
                             )
-                    );
-                    return tmp.map(Object::toString);
-                }
+                )
         );
     }
 
@@ -85,7 +79,7 @@ public class Controller {
                         "currency", Currency.class
                 ),
                 mapQ -> ReactiveDAO.itemDao.add(
-                        new ItemEntity(
+                        new Item(
                                 Integer.parseInt(mapQ.get("id").get(0)),
                                 mapQ.get("name").get(0),
                                 Double.parseDouble(mapQ.get("price").get(0)),
